@@ -1,6 +1,6 @@
 FROM golang:1.14-alpine as build
 
-LABEL Maintainer="Rodrigo Carneiro <rodrigo.carneiro@ymail.com>"
+LABEL Maintainer="Rodrigo Carneiro <rodrigo_carneiro@ymail.com>"
 
 ARG COMMIT='local'
 

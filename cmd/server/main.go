@@ -12,6 +12,7 @@ import (
 
 	"github.com/RodrigoDev/sword-task-manager/internal/config"
 	"github.com/RodrigoDev/sword-task-manager/internal/logging"
+	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task/storage"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task/user"
 	"github.com/RodrigoDev/sword-task-manager/internal/transport"
@@ -38,8 +39,12 @@ func Main(ctx context.Context) (err error) {
 	}
 
 	mysqlStorage := storage.NewMySQLStorage(cfg.MySQLConfig)
+	taskRepository, err := task.NewTaskRepository(mysqlStorage)
+	if err != nil {
+		logger.Fatal("error setting up the repository", zap.Error(err))
+	}
 
-	taskService := user.NewTaskService(mysqlStorage)
+	taskService := user.NewTaskService(taskRepository)
 
 	g, ctx := errgroup.WithContext(ctx)
 

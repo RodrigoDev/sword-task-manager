@@ -44,7 +44,7 @@ func WithSessionID(ctx context.Context, sessionID string) context.Context {
 }
 
 // Logger returns a zap logger with as much context as possible
-func Logger(ctx context.Context) zap.Logger {
+func Logger(ctx context.Context) *zap.Logger {
 	newLogger := defaultLogger
 	if ctx != nil {
 		if ctxRqID, ok := ctx.Value(requestIdKey).(string); ok {
@@ -54,5 +54,5 @@ func Logger(ctx context.Context) zap.Logger {
 			newLogger = newLogger.With(zap.String("sessionID", ctxSessionID))
 		}
 	}
-	return *newLogger
+	return newLogger
 }

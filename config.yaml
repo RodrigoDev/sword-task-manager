@@ -6,11 +6,11 @@ sword-task-manager:
     notification: "sword_notification"
 
 rabbitmq:
-  uri: amqp://guest:guest@rabbitmq:5672
+  uri: amqp://guest:guest@localhost:5672
   heartbeatInterval: 10
 
 mysql:
-  uri: db:3306
+  uri: localhost:3306
   user: "sword"
   password: "password"
   database: "sword-task"

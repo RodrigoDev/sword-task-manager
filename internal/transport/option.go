@@ -20,6 +20,7 @@ func Health() Option {
 func Task(taskService *user.TaskService) Option {
 	return func(h *Handler) error {
 		h.router.HandleFunc("/task", taskService.TaskHandler)
+		h.router.HandleFunc("/task/{id}", taskService.UpdateTaskHandler)
 		return nil
 	}
 }

@@ -1,0 +1,32 @@
+version: "3.6"
+
+services:
+  rabbitmq:
+    image: 'rabbitmq:3.8-management-alpine'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    networks:
+      - network
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'sword-task'
+      MYSQL_USER: 'sword'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    volumes:
+      - data:/var/lib/mysql
+
+volumes:
+  data:
+
+networks:
+  network: {}

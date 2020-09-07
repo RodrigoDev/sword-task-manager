@@ -1,0 +1,16 @@
+sword-task-manager:
+  exchange: "sword-task-manager"
+  type: "direct"
+  durable: true
+  routing_keys:
+    notification: "sword_notification"
+
+rabbitmq:
+  uri: amqp://guest:guest@rabbitmq:5672
+  heartbeatInterval: 10
+
+mysql:
+  uri: db:3306
+  user: "sword"
+  password: "password"
+  database: "sword-task"

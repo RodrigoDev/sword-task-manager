@@ -12,9 +12,9 @@ import (
 
 	"github.com/RodrigoDev/sword-task-manager/internal/config"
 	"github.com/RodrigoDev/sword-task-manager/internal/logging"
+	"github.com/RodrigoDev/sword-task-manager/internal/storage"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task"
-	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task/storage"
-	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task/user"
+	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/user"
 	"github.com/RodrigoDev/sword-task-manager/internal/transport"
 )
 
@@ -41,10 +41,16 @@ func Main(ctx context.Context) (err error) {
 	mysqlStorage := storage.NewMySQLStorage(cfg.MySQLConfig)
 	taskRepository, err := task.NewTaskRepository(mysqlStorage)
 	if err != nil {
-		logger.Fatal("error setting up the repository", zap.Error(err))
+		logger.Fatal("error setting up the task repository", zap.Error(err))
 	}
 
-	taskService := user.NewTaskService(taskRepository)
+	userRepository, err := user.NewRepository(mysqlStorage)
+	if err != nil {
+		logger.Fatal("error setting up the user repository", zap.Error(err))
+	}
+
+	taskService := task.NewTaskService(taskRepository)
+	userService := user.NewUserService(userRepository)
 
 	g, ctx := errgroup.WithContext(ctx)
 
@@ -52,6 +58,7 @@ func Main(ctx context.Context) (err error) {
 		h, err := transport.New(
 			transport.Health(),
 			transport.Task(taskService),
+			transport.User(userService),
 		)
 
 		if err != nil {

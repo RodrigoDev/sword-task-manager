@@ -10,3 +10,5 @@ type Task struct {
 	CreatedAt  *string `json:"created_at,omitempty"`
 	DoneAt     *string `json:"done_at,omitempty"`
 }
+
+type Tasks []Task

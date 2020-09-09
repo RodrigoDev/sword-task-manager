@@ -13,6 +13,7 @@ import (
 	"github.com/RodrigoDev/sword-task-manager/internal/config"
 	"github.com/RodrigoDev/sword-task-manager/internal/logging"
 	"github.com/RodrigoDev/sword-task-manager/internal/storage"
+	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/notification"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/user"
 	"github.com/RodrigoDev/sword-task-manager/internal/transport"
@@ -49,8 +50,14 @@ func Main(ctx context.Context) (err error) {
 		logger.Fatal("error setting up the user repository", zap.Error(err))
 	}
 
+	notificationRepository, err := notification.NewRepository(mysqlStorage)
+	if err != nil {
+		logger.Fatal("error setting up the notification repository", zap.Error(err))
+	}
+
 	taskService := task.NewTaskService(taskRepository)
 	userService := user.NewUserService(userRepository)
+	notificationService := notification.NewNotificationService(notificationRepository)
 
 	g, ctx := errgroup.WithContext(ctx)
 
@@ -59,6 +66,7 @@ func Main(ctx context.Context) (err error) {
 			transport.Health(),
 			transport.Task(taskService),
 			transport.User(userService),
+			transport.Notification(notificationService),
 		)
 
 		if err != nil {

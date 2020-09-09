@@ -20,27 +20,27 @@ func Health() Option {
 	}
 }
 
-// Task endpoints
-func Task(taskService *task.TaskService) Option {
-	return func(h *Handler) error {
-		h.router.HandleFunc("/tasks", taskService.CreateTaskHandler).Methods("POST")
-		h.router.HandleFunc("/tasks/{taskID}", taskService.GetTaskHandler).Methods("GET")
-		h.router.HandleFunc("/tasks", taskService.GetAllTasksHandler).Methods("GET")
-		h.router.HandleFunc("/tasks/{taskID}", taskService.UpdateTaskHandler).Methods("PUT")
-		h.router.HandleFunc("/tasks/{taskID}", taskService.DeleteTaskHandler).Methods("DELETE")
-		h.router.HandleFunc("/tasks/user/{userID}", taskService.FindTasksByManagerID).Methods("GET")
-
-		return nil
-	}
-}
-
+// User endpoints
 func User(service *user.Service) Option {
 	return func(h *Handler) error {
 		h.router.HandleFunc("/login", service.LoginHandler).Methods("POST")
 		h.router.HandleFunc("/register", service.CreateUserHandler).Methods("POST")
 
-		h.router.Use(auth.JwtVerify)
-		h.router.HandleFunc("/test", service.TestHandler).Methods("GET")
+		return nil
+	}
+}
+
+// Task endpoints
+func Task(taskService *task.TaskService) Option {
+	return func(h *Handler) error {
+		t := h.router.PathPrefix("/tasks").Subrouter()
+		t.Use(auth.JwtVerify)
+		t.HandleFunc("/", taskService.CreateTaskHandler).Methods("POST")
+		t.HandleFunc("/{taskID}", taskService.GetTaskHandler).Methods("GET")
+		t.HandleFunc("/", taskService.GetAllTasksHandler).Methods("GET")
+		t.HandleFunc("/{taskID}", taskService.UpdateTaskHandler).Methods("PUT")
+		t.HandleFunc("/{taskID}", taskService.DeleteTaskHandler).Methods("DELETE")
+		t.HandleFunc("/user/{userID}", taskService.FindTasksByManagerID).Methods("GET")
 
 		return nil
 	}
@@ -48,7 +48,11 @@ func User(service *user.Service) Option {
 
 func Notification(service *notification.Service) Option {
 	return func(h *Handler) error {
-		h.router.HandleFunc("/notifications", service.CreateNotificationHandler).Methods("POST")
-		h.router.HandleFunc("/notifications/user/{userID}", service.CreateNotificationHandler).Methods("GET")
+		n := h.router.PathPrefix("/notifications").Subrouter()
+		n.Use(auth.JwtVerify)
+		n.HandleFunc("/", service.CreateNotificationHandler).Methods("POST")
+		n.HandleFunc("/user/{userID}", service.CreateNotificationHandler).Methods("GET")
+
+		return nil
 	}
 }

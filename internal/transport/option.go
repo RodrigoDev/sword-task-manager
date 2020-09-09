@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/RodrigoDev/sword-task-manager/internal/auth"
+	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/notification"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/task"
 	"github.com/RodrigoDev/sword-task-manager/internal/taskmanager/user"
 )
@@ -42,5 +43,12 @@ func User(service *user.Service) Option {
 		h.router.HandleFunc("/test", service.TestHandler).Methods("GET")
 
 		return nil
+	}
+}
+
+func Notification(service *notification.Service) Option {
+	return func(h *Handler) error {
+		h.router.HandleFunc("/notifications", service.CreateNotificationHandler).Methods("POST")
+		h.router.HandleFunc("/notifications/user/{userID}", service.CreateNotificationHandler).Methods("GET")
 	}
 }
